@@ -1,0 +1,45 @@
+import path from 'path';
+import { google } from 'googleapis';
+
+const sheets = google.sheets('v4');
+
+async function addRowToSheets(auth, spreadsheetId, values){
+    const requets = {
+        spreadsheetId,
+        range: 'reservas',
+        valueInputOption: 'RAW',
+        insertDataOption: 'INSERT_ROWS',
+        resource: {
+            values: [values],
+        },
+        auth,
+    }
+
+    try{
+        const response = (await sheets.spreadsheets.values.append(requets).data);
+        return response;
+
+    }catch(e){
+        console.error(error)
+    }
+}
+
+const appendToSheet = async (data) => {
+    try{
+        const auth = new google.auth.GoogleAuth({
+            keyFile: path.join(process.cwd(), 'src/credentials', 'credentials.json'),
+            scopes: ['https://www.googleapis.com/auth/spreadsheets']
+        })
+        const authClient = await auth.getClient();
+        const spreadsheetId = '1lmkhbGFvcWCe_hYz-YWTxR_eT0ZLWGuOAHBN_9PnRqo'
+
+        await addRowToSheets(authClient, spreadsheetId, data)
+
+        return 'Datos correctamente agregados'
+    }catch(error){
+        console.error(error);
+    }
+
+}
+
+export default appendToSheet;
